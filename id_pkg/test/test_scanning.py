@@ -26,7 +26,7 @@ class TestScanning(unittest.TestCase):
         for scans in range(1, 255, 4):
             log_str = scan_msg['Date'] + ' ' + scan_msg['Host'] + ' : ' + scan_msg['ID'] + ': '
             log_str = log_str + '192.168.3.10 is attacking. Current burst rate is 200 per second, max configured rate is 0; ' \
-                                'Current average rate is 0 per second, max configured rate is 0; Cumulative total count is 2024\n '
+                                'Current average rate is 0 per second, max configured rate is 0; Cumulative total count is 2024\n'
             f.write(log_str)
 
     def test_has_scanning(self):
