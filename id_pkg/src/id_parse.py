@@ -9,10 +9,10 @@ class IdParse(LogParse):
     def __init__(self, syslog_file):
         self.syslog_to_dataframe(syslog_file)
 
-    # def has_ip_spoofing(self):
-    #     # https://pandas.pydata.org/docs/reference/api/pandas.Series.any.html
-    #     # Returns true if the ip spoofing id appears in the dataframe
-    #     return (self.df['ID'] == 106016).any()
+    def has_ip_spoofing(self):
+        # https://pandas.pydata.org/docs/reference/api/pandas.Series.any.html
+        # Returns true if the ip spoofing id appears in the dataframe
+        return (self.df['ID'] == 106016).any()
 
 
     def has_icmp(self):
@@ -21,20 +21,19 @@ class IdParse(LogParse):
         return (self.df['ID'] == 313008).any()
 
     def handle_asa_message(self, rec):
-        # """Implement ASA specific messages"""
-        # # %ASA-2-106016: Deny IP spoof from (10.1.1.1) to 10.11.11.19 on interface TestInterface
-        # if rec['ID'] == 106016:
-        #     m = re.search(r'from \((\d+\.\d+\.\d+\.\d+)\) to (\d+\.\d+\.\d+\.\d+) on interface (\w+)', rec['Text'])
-        #     if m:
-        #         rec['Source'] = m.group(1)
-        #         rec['Destination'] = m.group(2)
-        #         rec['Interface'] = m.group(3)
-        # return rec
+        """Implement ASA specific messages"""
+        # %ASA-2-106016: Deny IP spoof from (10.1.1.1) to 10.11.11.19 on interface TestInterface
+        if rec['ID'] == 106016:
+            m = re.search(r'Deny IP spoof from \((\d+\.\d+\.\d+\.\d+)\) to (\d+\.\d+\.\d+\.\d+) on interface (\w+)', rec['Text'])
+            if m:
+                rec['Source'] = m.group(1)
+                rec['Destination'] = m.group(2)
+                rec['Interface'] = m.group(3)
 
-        # %ASA-3-313008: Denied ICMPv6 type=number , code=code from IP_address on interface interface_name
-        if rec['ID'] == 313008:
+
+        elif rec['ID'] == 313008:
+            # %ASA-3-313008: Denied ICMPv6 type=number , code=code from IP_address on interface interface_name
             message = re.search(r'Denied ICMPv6 type=(\d+), code=(\d+) from (\d+\.\d+\.\d+\.\d+) on interface (\w+)', rec['Text'])
-
             if message:
                 rec['Number'] = message.group(1)
                 rec['Code'] = message.group(2)
