@@ -14,6 +14,10 @@ class IdParse(LogParse):
         # Returns true if the ip spoofing id appears in the dataframe
         return (self.df['ID'] == 106016).any()
 
+    def has_scanning(self):
+        # Returns true if the scanning id appears in the dataframe
+        return (self.df['ID'] == 733101).any()
+
     def handle_asa_message(self, rec):
         """Implement ASA specific messages"""
         # %ASA-2-106016: Deny IP spoof from (10.1.1.1) to 10.11.11.19 on interface TestInterface
@@ -23,6 +27,13 @@ class IdParse(LogParse):
                 rec['Source'] = m.group(1)
                 rec['Destination'] = m.group(2)
                 rec['Interface'] = m.group(3)
+        # %ASA-4-733101: Host 175.0.0.1 is attacking. Current burst rate is 200 per second, max configured rate is 0;
+        # Current average rate is 0 per second, max configured rate is 0; Cumulative total count is 2024
+        elif rec['ID'] == 733101:
+            m = re.search(r'(\d+\.\d+\.\d+\.\d+) is attacking', rec['Text'])
+            if m:
+                rec['Source'] = m.group(1)
+
         return rec
 
     def handle_syslog_message(self, line):
