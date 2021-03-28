@@ -3,6 +3,7 @@ import git
 import os
 import id_pkg as intrusion_detect
 
+
 class TestIcmpCommand(unittest.TestCase):
     git_root = os.path.join(git.Repo('.', search_parent_directories=True).working_tree_dir, 'id_pkg')
     syslog_file = os.path.join(git_root, 'data', 'icmp_command.txt')
@@ -33,15 +34,13 @@ class TestIcmpCommand(unittest.TestCase):
             # Create the first part of the message
             log_string = info['Date'] + ' ' + info['Host'] + ' : ' + info['ID'] + ': '
             # Next add the source IP address message
-            log_string = log_string + 'Denied ICMPv6 type=8, code=5 from 10.1.1.1'
+            log_string = log_string + 'Denied ICMPv6 type=8, code=5 from 10.1.1.' + str(ip_address_d)
 
             # Terminate the message with the interface name
             log_string = log_string + ' on interface ' + info['Interface'] + '\n'
             f.write(log_string)
 
-
     def test_icmp_command_parse_log(self):
-
         id_syslog = intrusion_detect.IdParse(self.syslog_file)
 
         # Check to make sure the icmp information got added to the dataframe
@@ -52,8 +51,8 @@ class TestIcmpCommand(unittest.TestCase):
         # Expecting 255 total records
         self.assertEqual(255, len(sdf))
 
-        # Expecting 1 source address
-        self.assertTrue((sdf['Source'] == '10.1.1.1').all())
+        # Expecting 255 unique source addresses
+        self.assertEqual(255, sdf['Source'].nunique())
 
         # Expecting 1 source address
         self.assertTrue((sdf['Interface'] == 'TestInterface').all())
