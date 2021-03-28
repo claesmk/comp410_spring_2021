@@ -14,19 +14,39 @@ class IdParse(LogParse):
         # Returns true if the ip spoofing id appears in the dataframe
         return (self.df['ID'] == 106016).any()
 
+
+
+    def has_icmp(self):
+        # https://pandas.pydata.org/docs/reference/api/pandas.Series.any.html
+        # Returns true if the ip spoofing id appears in the dataframe
+        return (self.df['ID'] == 313008).any()
+
     def has_scanning(self):
         # Returns true if the scanning id appears in the dataframe
         return (self.df['ID'] == 733101).any()
+
 
     def handle_asa_message(self, rec):
         """Implement ASA specific messages"""
         # %ASA-2-106016: Deny IP spoof from (10.1.1.1) to 10.11.11.19 on interface TestInterface
         if rec['ID'] == 106016:
-            m = re.search(r'from \((\d+\.\d+\.\d+\.\d+)\) to (\d+\.\d+\.\d+\.\d+) on interface (\w+)', rec['Text'])
+            m = re.search(r'Deny IP spoof from \((\d+\.\d+\.\d+\.\d+)\) to (\d+\.\d+\.\d+\.\d+) on interface (\w+)', rec['Text'])
             if m:
                 rec['Source'] = m.group(1)
                 rec['Destination'] = m.group(2)
                 rec['Interface'] = m.group(3)
+
+
+
+        elif rec['ID'] == 313008:
+            # %ASA-3-313008: Denied ICMPv6 type=number , code=code from IP_address on interface interface_name
+            message = re.search(r'Denied ICMPv6 type=(\d+), code=(\d+) from (\d+\.\d+\.\d+\.\d+) on interface (\w+)', rec['Text'])
+            if message:
+                rec['Number'] = message.group(1)
+                rec['Code'] = message.group(2)
+                rec['Source'] = message.group(3)
+                rec['Interface'] = message.group(4)
+
         # %ASA-4-733101: Host 175.0.0.1 is attacking. Current burst rate is 200 per second, max configured rate is 0;
         # Current average rate is 0 per second, max configured rate is 0; Cumulative total count is 2024
         elif rec['ID'] == 733101:
