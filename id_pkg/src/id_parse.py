@@ -14,8 +14,6 @@ class IdParse(LogParse):
         # Returns true if the ip spoofing id appears in the dataframe
         return (self.df['ID'] == 106016).any()
 
-
-
     def has_icmp(self):
         # https://pandas.pydata.org/docs/reference/api/pandas.Series.any.html
         # Returns true if the ip spoofing id appears in the dataframe
@@ -24,7 +22,6 @@ class IdParse(LogParse):
     def has_scanning(self):
         # Returns true if the scanning id appears in the dataframe
         return (self.df['ID'] == 733101).any()
-
 
     def handle_asa_message(self, rec):
         """Implement ASA specific messages"""
@@ -35,8 +32,6 @@ class IdParse(LogParse):
                 rec['Source'] = m.group(1)
                 rec['Destination'] = m.group(2)
                 rec['Interface'] = m.group(3)
-
-
 
         elif rec['ID'] == 313008:
             # %ASA-3-313008: Denied ICMPv6 type=number , code=code from IP_address on interface interface_name
