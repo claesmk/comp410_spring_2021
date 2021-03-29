@@ -23,6 +23,10 @@ class IdParse(LogParse):
         # Returns true if the scanning id appears in the dataframe
         return (self.df['ID'] == 733101).any()
 
+    def has_ACLDrop(self):
+        return (self.df['ID'] == 710003).any()
+
+
     def handle_asa_message(self, rec):
         """Implement ASA specific messages"""
         # %ASA-2-106016: Deny IP spoof from (10.1.1.1) to 10.11.11.19 on interface TestInterface
@@ -31,6 +35,14 @@ class IdParse(LogParse):
             if m:
                 rec['Source'] = m.group(1)
                 rec['Destination'] = m.group(2)
+                rec['Interface'] = m.group(3)
+
+        # %ASA-3-710003: {TCP|UDP} access denied by ACL from source_IP/source_port to interface_name:dest_IP/service
+        elif rec['ID'] == 710003:
+            m = re.search(r'UDP access denied by ACL from (\d+\.\d+\.\d+\.\d+) port (\d+) to interface_name:(\w+)', rec['Text'])
+            if m:
+                rec['Source'] = m.group(1)
+                rec['Port'] = m.group(2)
                 rec['Interface'] = m.group(3)
 
         elif rec['ID'] == 313008:
