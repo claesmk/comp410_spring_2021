@@ -14,9 +14,19 @@ class IdParse(LogParse):
         # Returns true if the ip spoofing id appears in the dataframe
         return (self.df['ID'] == 106016).any()
 
+    def has_bad_packets(self):
+        # https://pandas.pydata.org/docs/reference/api/pandas.Series.any.html
+        return (self.df['ID'] == 324301).any()
+
     def handle_asa_message(self, rec):
         """Implement ASA specific messages"""
-        # %ASA-2-106016: Deny IP spoof from (10.1.1.1) to 10.11.11.19 on interface TestInterface
+        # %ASA-3-324301: Radius Accounting Request has a bad header length hdr_len, packet length pkt_len
+        if rec['ID'] == 324301:
+            m = re.search(r'Radius Accounting Request has a bad header length (\d+), packet length (\w+)', rec['Text'])
+            if m:
+                rec['Header Length'] = m.group(1)
+                rec['Packet Length'] = m.group(2)
+
         if rec['ID'] == 106016:
             m = re.search(r'from \((\d+\.\d+\.\d+\.\d+)\) to (\d+\.\d+\.\d+\.\d+) on interface (\w+)', rec['Text'])
             if m:
