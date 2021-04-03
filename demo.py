@@ -1,4 +1,6 @@
 import pandas as pd
+import os
+import id_pkg as intrusion_detect
 
 
 def show_aggie_pride():
@@ -13,5 +15,26 @@ def show_aggie_pride():
     print(df)
 
 
+def pandas_demo():
+    """Shows how to use some pandas features needed to implement sprint 4"""
+    # The pandas help guide can be found here:
+    # https://pandas.pydata.org/docs/user_guide/index.html
+
+    # build a platform-safe path to the log file
+    # PC paths are "c:\dir\file" where linux and mac use "/dir/file"
+    # os.path.join() guarantees the correct path separator is used
+    log_file = os.path.join('id_pkg', 'data')
+    log_file = os.path.join(log_file, 'intrusion_logs.txt')
+
+    # Create an intrusion detection object similar to
+    # what was done during sprint 3
+    log = intrusion_detect.IdParse(log_file)
+
+    # Are there spoofing attacks in this log?
+    if log.has_ip_spoofing():
+        print('Spoofing attacks are present')
+
+
 if __name__ == "__main__":
-    show_aggie_pride()
+    # show_aggie_pride()
+    pandas_demo()
