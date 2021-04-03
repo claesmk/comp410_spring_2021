@@ -90,8 +90,12 @@ class IdParse(LogParse):
 
     def syslog_to_dataframe(self, syslog_file):
         """Returns a dataframe from a sample syslog file"""
+        # Improve pandas performance by creating a list first
+        rec_list = []
         # Read the syslog file and parse it into our dataframe
         with open(syslog_file, encoding='utf-8') as f:
             for line in f:
                 # Create a record to hold this line in the syslog file
-                self.df = self.df.append(self.handle_syslog_message(line), ignore_index=True)
+                rec_list.append(self.handle_syslog_message(line))
+        # Create the dataframe from the list
+        self.df = pd.DataFrame(rec_list)
