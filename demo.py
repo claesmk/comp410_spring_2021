@@ -34,6 +34,17 @@ def pandas_demo():
     if log.has_ip_spoofing():
         print('Spoofing attacks are present')
 
+    # This is probably how your application code should look when
+    # complete.  Note that the detail of the implementation is hidden
+    # from the application
+
+    # If this log has suspicious activity
+    # if log.has_suspicious():
+    #     # Save it to excel
+    #     log.write_suspicious_to_excel('suspicious.xlsx')
+    # else:
+    #     print('Nothing suspicious found')
+
 
 if __name__ == "__main__":
     # show_aggie_pride()

@@ -30,6 +30,12 @@ class IdParse(LogParse):
     def has_ACLDrop(self):
         return (self.df['ID'] == 710003).any()
 
+    def get_low_severity(self):
+        return self.df[self.df['Severity'] >= 6]
+
+    def get_high_severity(self):
+        return self.df[self.df['Severity'] <= 5]
+
 
     def handle_asa_message(self, rec):
         """Implement ASA specific messages"""
